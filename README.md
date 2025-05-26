@@ -41,7 +41,9 @@ Veja como o widget aparece no OBS:
 
 ## 📦 Executável
 
+O index.exe ja esta pronto, ja o index.py caso vc queira fazer mudanças e depois use o comando abaixo.
+
 Se quiser compartilhar o widget com outras pessoas, gere o executável com:
 
 ```bash
-pyinstaller --onefile --icon=icone.ico spotify_status_server.py
+pyinstaller --onefile --icon=icone.ico index.py
