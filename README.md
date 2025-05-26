@@ -2,6 +2,13 @@
 
 Este é um widget simples que mostra a música que você está ouvindo no Spotify diretamente no OBS, com visual moderno e integração via navegador.
 
+## 🖼️ Preview
+
+Veja como o widget aparece no OBS:
+
+![Preview do Widget](./assets/preview.gif)
+
+
 ## ✅ Recursos
 
 - Exibe nome da música, artista, álbum e capa.
