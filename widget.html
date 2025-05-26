@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Spotify Player Moderno</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="player" id="player">
+    <div class="top">
+      <img id="cover" class="cover" src="https://via.placeholder.com/80?text=♪" alt="Capa" />
+      <div class="info">
+        <div class="title nomarquee" id="title"><span>Carregando...</span></div>
+        <div class="artist" id="artist"></div>
+      </div>
+      <div class="playpause" id="playpause" title="Play/Pause">▶️</div>
+    </div>
+
+    <div class="progress-container">
+      <div class="progress" id="progress"></div>
+    </div>
+
+    <div class="time">
+      <span id="elapsed">0:00</span>
+      <span id="total">0:00</span>
+    </div>
+  </div>
+
+<script>
+  const player = document.getElementById("player");
+  const cover = document.getElementById("cover");
+  const titleEl = document.getElementById("title");
+  const artistEl = document.getElementById("artist");
+  const playpause = document.getElementById("playpause");
+  const progress = document.getElementById("progress");
+  const elapsedEl = document.getElementById("elapsed");
+  const totalEl = document.getElementById("total");
+
+  let duration = 0;
+  let progress_ms = 0;
+  let isPlaying = false;
+  let lastUpdate = 0;
+
+  // Formata ms para M:SS
+  function format(ms) {
+    const sec = Math.floor(ms / 1000);
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return `${m}:${s.toString().padStart(2, "0")}`;
+  }
+
+  // Atualiza UI com dados do backend
+  async function update() {
+    try {
+      const res = await fetch("http://127.0.0.1:8888/status");
+      const data = await res.json();
+
+      if(data.name) {
+        cover.src = data.cover;
+        titleEl.innerHTML = `<span>${data.name}</span>`;
+        artistEl.textContent = data.artist;
+        isPlaying = data.is_playing;
+        duration = data.duration || 0;
+        progress_ms = data.progress || 0;
+        lastUpdate = data.timestamp || Date.now();
+
+        // Atualiza total e estado play/pause
+        totalEl.textContent = format(duration);
+        playpause.textContent = isPlaying ? "⏸️" : "▶️";
+
+        // Controla marquee só se texto longo
+        if(titleEl.scrollWidth > titleEl.clientWidth){
+          titleEl.classList.remove("nomarquee");
+        } else {
+          titleEl.classList.add("nomarquee");
+        }
+
+        // Atualiza fundo blur (pseudo-element)
+        player.style.setProperty("--cover-url", `url(${data.cover})`);
+        player.style.background = "rgba(20,20,20,0.6)";
+        player.style.backdropFilter = "blur(20px)";
+        player.style.position = "relative";
+        // Atualiza o before com JS via style:
+        player.style.setProperty("--bg-img", `url(${data.cover})`);
+        player.style.setProperty("backgroundImage", `url(${data.cover})`);
+        // Pseudo-element via CSS vai usar essa URL, veja css abaixo.
+      } else {
+        resetUI();
+      }
+    } catch(e) {
+      resetUI();
+      console.error(e);
+    }
+  }
+
+  // Reseta UI para estado inicial
+  function resetUI() {
+    cover.src = "https://via.placeholder.com/80?text=♪";
+    titleEl.textContent = "Nada tocando";
+    artistEl.textContent = "";
+    playpause.textContent = "⏹️";
+    duration = 0;
+    progress_ms = 0;
+    lastUpdate = 0;
+    elapsedEl.textContent = "0:00";
+    totalEl.textContent = "0:00";
+    progress.style.width = "0%";
+  }
+
+  // Atualiza barra e tempo em tempo real
+  function animate() {
+    if(duration === 0) {
+      progress.style.width = "0%";
+      elapsedEl.textContent = "0:00";
+      requestAnimationFrame(animate);
+      return;
+    }
+
+    const now = Date.now();
+    const elapsedTime = isPlaying ? (now - lastUpdate) + progress_ms : progress_ms;
+    const pct = Math.min(elapsedTime / duration, 1);
+    progress.style.width = `${pct * 100}%`;
+    elapsedEl.textContent = format(elapsedTime);
+
+    requestAnimationFrame(animate);
+  }
+
+  // Inicializa
+  update();
+  setInterval(update, 5000);
+  animate();
+
+  // Play/Pause - só muda o ícone localmente
+  playpause.onclick = () => {
+    if(isPlaying) {
+      playpause.textContent = "▶️";
+      isPlaying = false;
+      lastUpdate = Date.now() - progress_ms; // pausa na posição atual
+    } else {
+      playpause.textContent = "⏸️";
+      isPlaying = true;
+      lastUpdate = Date.now() - progress_ms; // começa na posição atual
+    }
+  };
+</script>
+</body>
+</html>
