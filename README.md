@@ -5,6 +5,7 @@ Este é um widget simples que mostra a música que você está ouvindo no Spotif
 ## 🖼️ Preview
 
 Veja como o widget aparece no OBS:
+O background que esta na preview é ilustrativo.
 
 ![Preview do Widget](./assets/preview.gif)
 
