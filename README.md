@@ -10,7 +10,7 @@ O background que esta na preview é ilustrativo.
 ![Preview do Widget](./assets/preview.gif)
 
 
-## ✅ Recursos
+## ✅ Recursos do widget
 
 - Exibe nome da música, artista, álbum e capa.
 - Atualização em tempo real com base no Spotify.
@@ -48,4 +48,4 @@ Se quiser compartilhar o widget com outras pessoas, gere o executável com:
 
 ```bash
 pyinstaller --onefile --icon=icone.ico index.py
-by-ian
+
