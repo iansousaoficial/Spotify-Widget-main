@@ -48,3 +48,4 @@ Se quiser compartilhar o widget com outras pessoas, gere o executável com:
 
 ```bash
 pyinstaller --onefile --icon=icone.ico index.py
+by-ian
